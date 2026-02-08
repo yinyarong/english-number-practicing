@@ -164,10 +164,30 @@ function nextQuestion() {
 
 function renderInput() {
     els.userInput.textContent = state.userInput;
+    
+    // Hint: show placeholders for remaining chars if answer length is known
+    // But be careful not to reveal too much.
+    // A simple approach: 
+    // If state.currentAnswer has length N, user input U
+    // Display: U + (N - U.length underscores)
+    if (state.currentAnswer) {
+        const remaining = state.currentAnswer.length - state.userInput.length;
+        if (remaining > 0) {
+            // Use a lighter color or different style for placeholders
+            const placeholders = '_'.repeat(remaining);
+            const placeholderSpan = document.createElement('span');
+            placeholderSpan.style.opacity = '0.3';
+            placeholderSpan.textContent = placeholders;
+            els.userInput.appendChild(placeholderSpan);
+        }
+    }
 }
 
 function checkAnswer() {
     if (!state.currentAnswer) return;
+    
+    // Only check if length matches or user forced enter
+    // But wait, auto-submit logic calls this.
     
     state.stats.total++;
     const correct = state.userInput === state.currentAnswer;
@@ -198,26 +218,21 @@ function handleKey(key) {
         checkAnswer();
         return;
     } else if (key === 'replay') {
-        speak(generators[state.settings.modes[0]] ? generators[state.settings.modes[0]]().speak : ''); // Re-generate not easy here, need to store current speak text
-        // Fix: Store speak text in state
+        speak(generators[state.settings.modes[0]] ? generators[state.settings.modes[0]]().speak : ''); 
+        // Note: The replay logic is handled by the event listener wrapper below using state.currentSpeak
     } else {
-        // Limit length?
-        state.userInput += key;
+        // Limit length to answer length?
+        if (state.userInput.length < state.currentAnswer.length) {
+             state.userInput += key;
+        }
     }
     
     renderInput();
     
     // Auto-submit check
     if (state.settings.autoSubmit && state.userInput.length === state.currentAnswer.length) {
-        // Simple length check isn't perfect for all modes but good for fixed length ones.
-        // For variable length (number), auto-submit is risky.
-        // Let's only auto-submit if it matches length AND exact match (cheating?)
-        // Or just let user press enter for variable.
-        // Reference behavior: auto-submit usually works when match is found OR length maxed.
-        // Let's implement: if match, submit immediately.
-        if (state.userInput === state.currentAnswer) {
-            checkAnswer();
-        }
+        // If length matches, submit automatically!
+        checkAnswer();
     }
 }
 
