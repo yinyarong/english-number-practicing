@@ -163,22 +163,27 @@ function nextQuestion() {
 }
 
 function renderInput() {
-    els.userInput.textContent = state.userInput;
+    // Clear display first
+    els.userInput.innerHTML = '';
     
-    // Hint: show placeholders for remaining chars if answer length is known
-    // But be careful not to reveal too much.
-    // A simple approach: 
-    // If state.currentAnswer has length N, user input U
-    // Display: U + (N - U.length underscores)
+    // Create spans for input digits
+    for (let char of state.userInput) {
+        const span = document.createElement('span');
+        span.textContent = char;
+        els.userInput.appendChild(span);
+    }
+    
+    // Create spans for placeholders
     if (state.currentAnswer) {
         const remaining = state.currentAnswer.length - state.userInput.length;
         if (remaining > 0) {
-            // Use a lighter color or different style for placeholders
-            const placeholders = '_'.repeat(remaining);
-            const placeholderSpan = document.createElement('span');
-            placeholderSpan.style.opacity = '0.3';
-            placeholderSpan.textContent = placeholders;
-            els.userInput.appendChild(placeholderSpan);
+            for (let i = 0; i < remaining; i++) {
+                const span = document.createElement('span');
+                span.textContent = '_';
+                span.style.opacity = '0.3';
+                span.style.margin = '0 2px'; // Add some spacing
+                els.userInput.appendChild(span);
+            }
         }
     }
 }
