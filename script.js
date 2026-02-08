@@ -120,11 +120,28 @@ function updateStats() {
 function speak(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // Stop previous
+        
+        // Mobile Fix: Ensure voices are loaded. On mobile (iOS), voices load async and might be empty initially.
+        // Also, mobile browsers often block auto-play audio unless triggered by user interaction.
+        // The first 'Next' click is user interaction, so it should work, but sometimes context is lost.
+        
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = state.settings.language;
+        
+        // Force a specific voice if available, otherwise let system decide (better for mobile)
         if (state.settings.voice) {
             utterance.voice = state.settings.voice;
+        } else {
+            // Fallback strategy for mobile: try to find a good EN voice
+            const voices = window.speechSynthesis.getVoices();
+            const preferred = voices.find(v => v.lang === state.settings.language && !v.localService) || 
+                              voices.find(v => v.lang === state.settings.language);
+            if (preferred) utterance.voice = preferred;
         }
+        
+        // Mobile specific: volume and rate adjustments
+        utterance.volume = 1.0; 
+        utterance.rate = 0.9; // Slightly slower is better for practice
         
         // Visual feedback
         state.isSpeaking = true;
@@ -135,9 +152,29 @@ function speak(text) {
             els.playIcon.style.opacity = 1;
         };
         
+        utterance.onerror = (e) => {
+            console.error("Speech error:", e);
+            state.isSpeaking = false;
+            els.playIcon.style.opacity = 1;
+        };
+        
         window.speechSynthesis.speak(utterance);
+    } else {
+        alert("Your browser does not support text-to-speech.");
     }
 }
+
+// Mobile Audio Unlock (iOS Safari requirement)
+// We need to play a silent sound or trigger speech on the FIRST user interaction
+let audioUnlocked = false;
+function unlockAudio() {
+    if (audioUnlocked) return;
+    const u = new SpeechSynthesisUtterance('');
+    window.speechSynthesis.speak(u);
+    audioUnlocked = true;
+}
+document.body.addEventListener('click', unlockAudio, { once: true });
+document.body.addEventListener('touchstart', unlockAudio, { once: true });
 
 function nextQuestion() {
     // 1. Pick a mode from active modes

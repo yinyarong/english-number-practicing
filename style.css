@@ -227,10 +227,34 @@ select {
     background-color: #333;
 }
 
-.key.action {
-    background-color: #2a2a2a;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Mobile Optimization */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+        height: 100vh; /* Full viewport height */
+        justify-content: space-between;
+    }
+    
+    .input-display {
+        font-size: 1.8rem;
+    }
+    
+    .numpad {
+        padding-bottom: 20px; /* Space for home indicator */
+    }
+    
+    .key {
+        padding: 20px 0; /* Larger touch targets */
+        font-size: 1.8rem;
+    }
+    
+    .stats-bar {
+        font-size: 0.8rem;
+        padding: 10px;
+    }
+    
+    .play-icon svg {
+        width: 48px;
+        height: 48px;
+    }
 }
