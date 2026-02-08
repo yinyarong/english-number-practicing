@@ -9,6 +9,7 @@ const state = {
     },
     settings: {
         language: 'en-US',
+        theme: 'default',
         modes: ['number', 'date', 'time', 'year'], // default active
         voice: null,
         autoSubmit: true
@@ -20,6 +21,7 @@ const state = {
 const els = {
     settingsBtn: document.getElementById('settings-btn'),
     settingsPanel: document.getElementById('settings-panel'),
+    themeSelect: document.getElementById('theme-select'),
     languageSelect: document.getElementById('language-select'),
     voiceSelect: document.getElementById('voice-select'),
     modesContainer: document.getElementById('modes-container'),
@@ -180,8 +182,10 @@ function renderInput() {
             for (let i = 0; i < remaining; i++) {
                 const span = document.createElement('span');
                 span.textContent = '_';
-                span.style.opacity = '0.3';
-                span.style.margin = '0 2px'; // Add some spacing
+                // Use variable for color to support themes
+                span.style.color = 'var(--placeholder-color)'; 
+                span.style.opacity = '1'; // Opacity handled by color var or theme
+                span.style.margin = '0 2px'; 
                 els.userInput.appendChild(span);
             }
         }
@@ -202,10 +206,17 @@ function checkAnswer() {
         showMessage("Correct! " + state.currentDisplay, "correct");
         setTimeout(nextQuestion, 1000);
     } else {
-        showMessage("Wrong! It was " + state.currentDisplay, "incorrect");
-        // Don't auto advance on error? Or yes? Reference behavior: show correct answer then next.
-        // Let's reset after a delay
-        setTimeout(nextQuestion, 2000);
+        // Feature: Automatically show correct answer if wrong
+        showMessage("Wrong! Correct: " + state.currentDisplay, "incorrect");
+        
+        // Show correct answer in input display too for visual feedback?
+        // Or just keep it in message area. Message area is good.
+        // But user asked: "如果是错了，它会显示正确答案"
+        
+        // Feature: "如果是正确，就自动下一个练习" (Already implemented)
+        // User didn't say auto-next if wrong, but implies flow.
+        // Let's keep the delay then next.
+        setTimeout(nextQuestion, 2500); // Slightly longer delay to read answer
     }
     updateStats();
 }
@@ -287,6 +298,14 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Settings Listeners
+els.themeSelect.addEventListener('change', (e) => {
+    state.settings.theme = e.target.value;
+    document.body.className = ''; // clear previous
+    if (e.target.value !== 'default') {
+        document.body.classList.add(`theme-${e.target.value}`);
+    }
+});
+
 els.modesContainer.addEventListener('change', (e) => {
     const checked = Array.from(els.modesContainer.querySelectorAll('input:checked')).map(i => i.value);
     state.settings.modes = checked;
