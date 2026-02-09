@@ -195,18 +195,36 @@ function nextQuestion() {
     // 3. UI Reset
     renderInput();
     
-    // Update hint
-    let hintText = "";
+    // Update hint structure based on mode
+    let hintHTML = "";
     switch(mode) {
-        case 'number': hintText = "Number (0-9999)"; break;
-        case 'long-number': hintText = "Long Number"; break;
-        case 'phone-11': hintText = "Phone (11 digits)"; break;
-        case 'phone-8': hintText = "Phone (8 digits)"; break;
-        case 'year': hintText = "Year (YYYY)"; break;
-        case 'time': hintText = "Time (HHMM)"; break;
-        case 'date': hintText = "Date (YYYYMMDD)"; break;
+        case 'number': 
+            hintHTML = "<span>Number</span>"; 
+            break;
+        case 'long-number': 
+            hintHTML = "<span>Long Number</span>"; 
+            break;
+        case 'phone-11': 
+            hintHTML = "<span>Phone Number</span>"; 
+            break;
+        case 'phone-8': 
+            hintHTML = "<span>Phone Number</span>"; 
+            break;
+        case 'year': 
+            hintHTML = "<span>Year</span>"; 
+            break;
+        case 'time': 
+            // Structure: Hour Minute
+            hintHTML = "<span>Hour</span> <span style='opacity:0.3'>|</span> <span>Minute</span>"; 
+            break;
+        case 'date': 
+            // Structure: Year Month Day
+            // Or screenshot style: Month Date (if that's the mode). 
+            // But my generator is YYYY-MM-DD. So:
+            hintHTML = "<span>Year</span> <span style='opacity:0.3'>|</span> <span>Month</span> <span style='opacity:0.3'>|</span> <span>Day</span>"; 
+            break;
     }
-    els.inputHint.textContent = hintText;
+    els.inputHint.innerHTML = hintHTML;
 
     els.messageArea.textContent = '';
     els.messageArea.className = 'message hidden';

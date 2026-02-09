@@ -182,11 +182,16 @@ select {
 }
 
 .input-hint {
-    font-size: 0.8rem;
-    color: var(--placeholder-color);
-    margin-top: 5px;
-    height: 1rem;
-    font-style: italic;
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin-bottom: 15px; /* Space above play icon */
+    font-weight: 500;
+    letter-spacing: 1px;
+    height: 1.2rem;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 .cursor {
