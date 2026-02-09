@@ -50,6 +50,7 @@ body {
     color: var(--text-color);
     display: flex;
     justify-content: center;
+    align-items: center; /* Vertically center the app */
     min-height: 100vh;
 }
 
@@ -60,6 +61,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    /* Ensure container doesn't stretch full height on large screens if not needed */
+    flex-grow: 0; 
 }
 
 header {
@@ -208,15 +211,15 @@ select {
     min-height: 2.4rem;
     display: flex;
     align-items: center;
+    justify-content: center; /* Center input text horizontally */
 }
 
 .input-hint {
     font-size: 1rem;
     color: var(--text-color);
-    opacity: 0.8;
-    margin-bottom: 15px; /* Space above play icon */
-    font-weight: 500;
-    letter-spacing: 1px;
+    opacity: 0.6;
+    margin-bottom: 10px;
+    font-weight: normal;
     height: 1.2rem;
     display: flex;
     justify-content: center;
