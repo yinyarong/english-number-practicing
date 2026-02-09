@@ -32,6 +32,7 @@ const els = {
     statAccuracy: document.getElementById('stat-accuracy'),
     
     userInput: document.getElementById('user-input'),
+    inputHint: document.getElementById('input-hint'), // New element
     messageArea: document.getElementById('message-area'),
     playIcon: document.getElementById('play-icon'),
     keys: document.querySelectorAll('.key')
@@ -193,6 +194,20 @@ function nextQuestion() {
     
     // 3. UI Reset
     renderInput();
+    
+    // Update hint
+    let hintText = "";
+    switch(mode) {
+        case 'number': hintText = "Number (0-9999)"; break;
+        case 'long-number': hintText = "Long Number"; break;
+        case 'phone-11': hintText = "Phone (11 digits)"; break;
+        case 'phone-8': hintText = "Phone (8 digits)"; break;
+        case 'year': hintText = "Year (YYYY)"; break;
+        case 'time': hintText = "Time (HHMM)"; break;
+        case 'date': hintText = "Date (YYYYMMDD)"; break;
+    }
+    els.inputHint.textContent = hintText;
+
     els.messageArea.textContent = '';
     els.messageArea.className = 'message hidden';
     

@@ -181,6 +181,14 @@ select {
     align-items: center;
 }
 
+.input-hint {
+    font-size: 0.8rem;
+    color: var(--placeholder-color);
+    margin-top: 5px;
+    height: 1rem;
+    font-style: italic;
+}
+
 .cursor {
     animation: blink 1s step-end infinite;
     color: var(--accent-color);
