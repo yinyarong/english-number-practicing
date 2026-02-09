@@ -217,13 +217,17 @@ select {
 .input-hint {
     font-size: 1rem;
     color: var(--text-color);
-    opacity: 0.6;
-    margin-bottom: 10px;
-    font-weight: normal;
-    height: 1.2rem;
+    opacity: 0.8;
+    margin-bottom: 20px; /* Increased space */
+    font-weight: 500;
+    letter-spacing: 1px;
+    height: 1.5rem; /* Ensure enough height */
     display: flex;
     justify-content: center;
     gap: 10px;
+    /* Force visibility */
+    visibility: visible !important;
+    min-width: 100px;
 }
 
 .cursor {

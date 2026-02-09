@@ -9,20 +9,20 @@ const state = {
     },
     settings: {
         language: 'en-US',
-        theme: 'telegram', // Set new theme as default
-        modes: ['number', 'date', 'time', 'year'], 
+        theme: 'default', // Default theme
+        modes: ['number', 'date', 'time', 'year'], // default active
         voice: null,
         autoSubmit: true
     },
     isSpeaking: false,
-    currentMode: 'number' // Initialize with a default
+    currentMode: 'number'
 };
 
 // DOM Elements
 const els = {
     settingsBtn: document.getElementById('settings-btn'),
     settingsPanel: document.getElementById('settings-panel'),
-    themeSelect: document.getElementById('header-theme-select'), // Moved to header
+    themeSelect: document.getElementById('header-theme-select'),
     languageSelect: document.getElementById('language-select'),
     voiceSelect: document.getElementById('voice-select'),
     modesContainer: document.getElementById('modes-container'),
@@ -33,7 +33,7 @@ const els = {
     statAccuracy: document.getElementById('stat-accuracy'),
     
     userInput: document.getElementById('user-input'),
-    inputHint: document.getElementById('input-hint'), // New element
+    inputHint: document.getElementById('input-hint'),
     messageArea: document.getElementById('message-area'),
     playIcon: document.getElementById('play-icon'),
     keys: document.querySelectorAll('.key')
@@ -54,7 +54,6 @@ const generators = {
         const prefix = ['13', '15', '18', '17'][Math.floor(Math.random() * 4)];
         const suffix = Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
         const num = prefix + suffix;
-        // Grouping for speech often helps: 138 1234 5678
         const speak = num.split('').join(' '); 
         return { speak: speak, display: num, answer: num };
     },
@@ -71,27 +70,18 @@ const generators = {
         const h = Math.floor(Math.random() * 24);
         const m = Math.floor(Math.random() * 60);
         const mStr = m.toString().padStart(2, '0');
-        const hStr = h.toString(); // 24h format usually
-        // 12:05 -> twelve oh five
         let speak = `${h} ${m}`;
         if (m < 10) speak = `${h} oh ${m}`;
         if (m === 0) speak = `${h} o'clock`;
-        
-        const answer = `${h}${mStr}`; // Expecting 1230 for 12:30 or 905 for 9:05?
-        // Reference implies simple number input. Let's assume standard HHMM input or Colon.
-        // Simplified: User inputs numbers. We format visually?
-        // For simplicity, let's require HHMM format input without colon
+        const answer = `${h}${mStr}`; 
         return { speak: speak, display: `${h}:${mStr}`, answer: `${h}${mStr}` };
     },
     'date': () => {
-        // Simple year/month/day
         const y = Math.floor(Math.random() * (2025 - 2000) + 2000);
         const m = Math.floor(Math.random() * 12) + 1;
         const d = Math.floor(Math.random() * 28) + 1;
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         
-        // Speak: "July 4th 2020"
-        // Ordinal suffix
         const suffix = (d) => {
             if (d > 3 && d < 21) return 'th';
             switch (d % 10) {
@@ -103,8 +93,6 @@ const generators = {
         };
         
         const speak = `${months[m-1]} ${d}${suffix(d)} ${y}`;
-        // Expected input: 20200704 or similar? 
-        // Let's stick to standard YYYYMMDD for input simplicity
         const mStr = m.toString().padStart(2, '0');
         const dStr = d.toString().padStart(2, '0');
         return { speak: speak, display: `${y}-${mStr}-${dStr}`, answer: `${y}${mStr}${dStr}` };
@@ -123,29 +111,21 @@ function speak(text) {
     if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel(); // Stop previous
         
-        // Mobile Fix: Ensure voices are loaded. On mobile (iOS), voices load async and might be empty initially.
-        // Also, mobile browsers often block auto-play audio unless triggered by user interaction.
-        // The first 'Next' click is user interaction, so it should work, but sometimes context is lost.
-        
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = state.settings.language;
         
-        // Force a specific voice if available, otherwise let system decide (better for mobile)
         if (state.settings.voice) {
             utterance.voice = state.settings.voice;
         } else {
-            // Fallback strategy for mobile: try to find a good EN voice
             const voices = window.speechSynthesis.getVoices();
             const preferred = voices.find(v => v.lang === state.settings.language && !v.localService) || 
                               voices.find(v => v.lang === state.settings.language);
             if (preferred) utterance.voice = preferred;
         }
         
-        // Mobile specific: volume and rate adjustments
         utterance.volume = 1.0; 
-        utterance.rate = 0.9; // Slightly slower is better for practice
+        utterance.rate = 0.9; 
         
-        // Visual feedback
         state.isSpeaking = true;
         els.playIcon.style.opacity = 0.5;
         
@@ -166,8 +146,7 @@ function speak(text) {
     }
 }
 
-// Mobile Audio Unlock (iOS Safari requirement)
-// We need to play a silent sound or trigger speech on the FIRST user interaction
+// Mobile Audio Unlock
 let audioUnlocked = false;
 function unlockAudio() {
     if (audioUnlocked) return;
@@ -178,25 +157,8 @@ function unlockAudio() {
 document.body.addEventListener('click', unlockAudio, { once: true });
 document.body.addEventListener('touchstart', unlockAudio, { once: true });
 
-function nextQuestion() {
-    // 1. Pick a mode from active modes
-    const availableModes = state.settings.modes;
-    if (availableModes.length === 0) {
-        alert("请至少选择一种模式!");
-        return;
-    }
-    const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
-    state.currentMode = mode; // Store current mode for hint rendering
-    
-    // 2. Generate
-    const gen = generators[mode]();
-    state.currentAnswer = gen.answer;
-    state.currentDisplay = gen.display;
-    state.userInput = '';
-    
-    // 3. UI Reset
-    // IMPORTANT: Update hint BEFORE resetting input to ensure it's visible
-    // Update hint structure based on mode
+function updateHint() {
+    const mode = state.currentMode || 'number';
     let hintHTML = "";
     switch(mode) {
         case 'number': 
@@ -215,50 +177,67 @@ function nextQuestion() {
             hintHTML = "<span>年份 (YYYY)</span>"; 
             break;
         case 'time': 
-            // Structure: Hour Minute
             hintHTML = "<span>时</span> <span style='opacity:0.3'>:</span> <span>分</span>"; 
             break;
         case 'date': 
-            // Structure: Year Month Day
             hintHTML = "<span>年</span> <span style='opacity:0.3'>/</span> <span>月</span> <span style='opacity:0.3'>/</span> <span>日</span>"; 
             break;
+        default:
+            hintHTML = "<span>数字</span>";
     }
-    // Debug log to console to verify execution
-    console.log("Setting hint to:", hintHTML);
-    els.inputHint.innerHTML = hintHTML;
     
-    // Ensure element is visible
-    els.inputHint.style.display = 'flex';
-    els.inputHint.style.opacity = '1';
+    if (els.inputHint) {
+        els.inputHint.innerHTML = hintHTML;
+        els.inputHint.style.display = 'flex'; // Ensure visible
+        els.inputHint.style.opacity = '1';
+    }
+}
 
+function nextQuestion() {
+    // 1. Pick a mode
+    const availableModes = state.settings.modes;
+    if (availableModes.length === 0) {
+        alert("请至少选择一种模式!");
+        return;
+    }
+    const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
+    state.currentMode = mode;
+    
+    // 2. Generate
+    const gen = generators[mode]();
+    state.currentAnswer = gen.answer;
+    state.currentDisplay = gen.display;
+    state.userInput = '';
+    
+    // 3. UI Reset
     renderInput();
+    updateHint(); // Explicitly call updateHint
+    
+    els.messageArea.textContent = '';
+    els.messageArea.className = 'message hidden';
     
     // 4. Speak
     speak(gen.speak);
-    console.log("Target:", gen.answer); // Debug
+    console.log("Target:", gen.answer);
 }
 
 function renderInput() {
-    // Clear display first
     els.userInput.innerHTML = '';
     
-    // Create spans for input digits
     for (let char of state.userInput) {
         const span = document.createElement('span');
         span.textContent = char;
         els.userInput.appendChild(span);
     }
     
-    // Create spans for placeholders
     if (state.currentAnswer) {
         const remaining = state.currentAnswer.length - state.userInput.length;
         if (remaining > 0) {
             for (let i = 0; i < remaining; i++) {
                 const span = document.createElement('span');
                 span.textContent = '_';
-                // Use variable for color to support themes
                 span.style.color = 'var(--placeholder-color)'; 
-                span.style.opacity = '1'; // Opacity handled by color var or theme
+                span.style.opacity = '1';
                 span.style.margin = '0 2px'; 
                 els.userInput.appendChild(span);
             }
@@ -269,9 +248,6 @@ function renderInput() {
 function checkAnswer() {
     if (!state.currentAnswer) return;
     
-    // Only check if length matches or user forced enter
-    // But wait, auto-submit logic calls this.
-    
     state.stats.total++;
     const correct = state.userInput === state.currentAnswer;
     
@@ -280,17 +256,8 @@ function checkAnswer() {
         showMessage("正确! " + state.currentDisplay, "correct");
         setTimeout(nextQuestion, 1000);
     } else {
-        // Feature: Automatically show correct answer if wrong
         showMessage("错误! 正确答案: " + state.currentDisplay, "incorrect");
-        
-        // Show correct answer in input display too for visual feedback?
-        // Or just keep it in message area. Message area is good.
-        // But user asked: "如果是错了，它会显示正确答案"
-        
-        // Feature: "如果是正确，就自动下一个练习" (Already implemented)
-        // User didn't say auto-next if wrong, but implies flow.
-        // Let's keep the delay then next.
-        setTimeout(nextQuestion, 2500); // Slightly longer delay to read answer
+        setTimeout(nextQuestion, 2500); 
     }
     updateStats();
 }
@@ -309,9 +276,7 @@ function handleKey(key) {
         return;
     } else if (key === 'replay') {
         speak(generators[state.settings.modes[0]] ? generators[state.settings.modes[0]]().speak : ''); 
-        // Note: The replay logic is handled by the event listener wrapper below using state.currentSpeak
     } else {
-        // Limit length to answer length?
         if (state.userInput.length < state.currentAnswer.length) {
              state.userInput += key;
         }
@@ -319,33 +284,19 @@ function handleKey(key) {
     
     renderInput();
     
-    // Auto-submit check
     if (state.settings.autoSubmit && state.userInput.length === state.currentAnswer.length) {
-        // If length matches, submit automatically!
         checkAnswer();
     }
 }
 
-// Fix Replay
-// We need to overwrite the generator call in nextQuestion to store the speak text
+// Replay button logic
+// Overwrite nextQuestion to store current speak text
 const originalNext = nextQuestion;
-nextQuestion = function() {
-    const availableModes = state.settings.modes;
-    if (availableModes.length === 0) return;
-    const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
-    const gen = generators[mode]();
-    
-    state.currentAnswer = gen.answer;
-    state.currentDisplay = gen.display;
-    state.currentSpeak = gen.speak; // Store for replay
-    state.userInput = '';
-    
-    renderInput();
-    els.messageArea.textContent = '';
-    els.messageArea.className = 'message hidden';
-    
-    speak(gen.speak);
-};
+// Redefine to capture speak text properly
+// Wait, the generators logic is inside nextQuestion.
+// Let's modify nextQuestion to store state.currentSpeak
+// (Already doing this? No, previous write didn't include it in generators logic, it was a separate patch)
+// Let's ensure generators return speak text and we store it.
 
 // Listeners
 els.settingsBtn.addEventListener('click', () => {
@@ -356,25 +307,70 @@ els.keys.forEach(k => {
     k.addEventListener('click', () => {
         const key = k.dataset.key;
         if (key === 'replay') {
-            speak(state.currentSpeak);
+            // Use state.currentAnswer to re-generate speak? No.
+            // We need to store current speak text.
+            // Let's hack it: re-read from currentDisplay? No.
+            // Better: Store it in state.
+            // Since I'm rewriting the whole file, I'll fix nextQuestion below.
         } else {
             handleKey(key);
         }
     });
 });
 
-// Keyboard support
+// Re-implement NextQuestion properly with state.currentSpeak
+// And Replay logic
+// (Overwriting the previous definition)
+nextQuestion = function() {
+    const availableModes = state.settings.modes;
+    if (availableModes.length === 0) {
+        alert("请至少选择一种模式!");
+        return;
+    }
+    const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
+    state.currentMode = mode;
+    
+    const gen = generators[mode]();
+    state.currentAnswer = gen.answer;
+    state.currentDisplay = gen.display;
+    state.currentSpeak = gen.speak; // Store!
+    state.userInput = '';
+    
+    renderInput();
+    updateHint();
+    
+    els.messageArea.textContent = '';
+    els.messageArea.className = 'message hidden';
+    
+    speak(gen.speak);
+};
+
+// Replay Button listener
+const replayBtn = document.getElementById('replay-btn');
+if (replayBtn) {
+    replayBtn.addEventListener('click', () => {
+        if (state.currentSpeak) speak(state.currentSpeak);
+    });
+}
+
+// Click on input area to replay
+document.getElementById('input-area').addEventListener('click', () => {
+    if (state.currentSpeak) speak(state.currentSpeak);
+});
+
 document.addEventListener('keydown', (e) => {
     if (e.key >= '0' && e.key <= '9') handleKey(e.key);
     if (e.key === 'Backspace') handleKey('backspace');
     if (e.key === 'Enter') handleKey('enter');
-    if (e.key === ' ') speak(state.currentSpeak); // Space to replay
+    if (e.key === ' ') {
+        e.preventDefault(); // Prevent scroll
+        if (state.currentSpeak) speak(state.currentSpeak);
+    }
 });
 
-// Settings Listeners
 els.themeSelect.addEventListener('change', (e) => {
     state.settings.theme = e.target.value;
-    document.body.className = ''; // clear previous
+    document.body.className = ''; 
     if (e.target.value !== 'default') {
         document.body.classList.add(`theme-${e.target.value}`);
     }
@@ -399,7 +395,6 @@ els.voiceSelect.addEventListener('change', (e) => {
     state.settings.voice = voices.find(v => v.name === e.target.value);
 });
 
-// Init Voices
 function loadVoices() {
     const voices = window.speechSynthesis.getVoices();
     els.voiceSelect.innerHTML = '<option value="">默认</option>';
@@ -413,6 +408,6 @@ function loadVoices() {
 
 window.speechSynthesis.onvoiceschanged = loadVoices;
 
-// Start
 loadVoices();
-nextQuestion();
+// Wait a bit for voices to load?
+setTimeout(nextQuestion, 100);
