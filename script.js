@@ -161,7 +161,7 @@ function speak(text) {
         
         window.speechSynthesis.speak(utterance);
     } else {
-        alert("Your browser does not support text-to-speech.");
+        alert("您的浏览器不支持文字转语音功能 (TTS)。");
     }
 }
 
@@ -181,7 +181,7 @@ function nextQuestion() {
     // 1. Pick a mode from active modes
     const availableModes = state.settings.modes;
     if (availableModes.length === 0) {
-        alert("Please select at least one mode!");
+        alert("请至少选择一种模式!");
         return;
     }
     const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
@@ -199,29 +199,29 @@ function nextQuestion() {
     let hintHTML = "";
     switch(mode) {
         case 'number': 
-            hintHTML = "<span>Number</span>"; 
+            hintHTML = "<span>数字 (0-9999)</span>"; 
             break;
         case 'long-number': 
-            hintHTML = "<span>Long Number</span>"; 
+            hintHTML = "<span>长数字</span>"; 
             break;
         case 'phone-11': 
-            hintHTML = "<span>Phone Number</span>"; 
+            hintHTML = "<span>手机号 (11位)</span>"; 
             break;
         case 'phone-8': 
-            hintHTML = "<span>Phone Number</span>"; 
+            hintHTML = "<span>电话号 (8位)</span>"; 
             break;
         case 'year': 
-            hintHTML = "<span>Year</span>"; 
+            hintHTML = "<span>年份 (YYYY)</span>"; 
             break;
         case 'time': 
             // Structure: Hour Minute
-            hintHTML = "<span>Hour</span> <span style='opacity:0.3'>|</span> <span>Minute</span>"; 
+            hintHTML = "<span>时</span> <span style='opacity:0.3'>:</span> <span>分</span>"; 
             break;
         case 'date': 
             // Structure: Year Month Day
             // Or screenshot style: Month Date (if that's the mode). 
             // But my generator is YYYY-MM-DD. So:
-            hintHTML = "<span>Year</span> <span style='opacity:0.3'>|</span> <span>Month</span> <span style='opacity:0.3'>|</span> <span>Day</span>"; 
+            hintHTML = "<span>年</span> <span style='opacity:0.3'>/</span> <span>月</span> <span style='opacity:0.3'>/</span> <span>日</span>"; 
             break;
     }
     els.inputHint.innerHTML = hintHTML;
@@ -273,11 +273,11 @@ function checkAnswer() {
     
     if (correct) {
         state.stats.correct++;
-        showMessage("Correct! " + state.currentDisplay, "correct");
+        showMessage("正确! " + state.currentDisplay, "correct");
         setTimeout(nextQuestion, 1000);
     } else {
         // Feature: Automatically show correct answer if wrong
-        showMessage("Wrong! Correct: " + state.currentDisplay, "incorrect");
+        showMessage("错误! 正确答案: " + state.currentDisplay, "incorrect");
         
         // Show correct answer in input display too for visual feedback?
         // Or just keep it in message area. Message area is good.
@@ -398,7 +398,7 @@ els.voiceSelect.addEventListener('change', (e) => {
 // Init Voices
 function loadVoices() {
     const voices = window.speechSynthesis.getVoices();
-    els.voiceSelect.innerHTML = '<option value="">Default</option>';
+    els.voiceSelect.innerHTML = '<option value="">默认</option>';
     voices.filter(v => v.lang.startsWith(state.settings.language.split('-')[0])).forEach(v => {
         const opt = document.createElement('option');
         opt.value = v.name;

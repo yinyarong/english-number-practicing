@@ -1,13 +1,13 @@
 :root {
-    /* Default Dark Theme */
+    /* Default Dark Theme - Optimized for Chinese readability */
     --bg-color: #121212;
-    --text-color: #e0e0e0;
+    --text-color: #f0f0f0; /* Brighter text */
     --accent-color: #bb86fc;
-    --secondary-bg: #1e1e1e;
-    --input-border: rgba(255, 255, 255, 0.1);
-    --success-color: #4caf50;
-    --error-color: #cf6679;
-    --placeholder-color: rgba(255, 255, 255, 0.3);
+    --secondary-bg: #2d2d2d; /* Slightly lighter background for cards */
+    --input-border: rgba(255, 255, 255, 0.15);
+    --success-color: #66bb6a; /* Softer green */
+    --error-color: #ef5350; /* Softer red */
+    --placeholder-color: rgba(255, 255, 255, 0.4);
 }
 
 body.theme-light {
