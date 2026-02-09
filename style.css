@@ -70,6 +70,35 @@ header {
     border-bottom: 1px solid var(--input-border);
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-select-mini {
+    background-color: transparent;
+    color: var(--text-color);
+    border: 1px solid var(--input-border);
+    border-radius: 15px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.theme-select-mini:hover {
+    opacity: 1;
+    background-color: rgba(255,255,255,0.05);
+}
+
+.theme-select-mini option {
+    background-color: var(--secondary-bg);
+    color: var(--text-color);
+}
+
 h1 {
     font-size: 1.2rem;
     margin: 0;

@@ -21,7 +21,7 @@ const state = {
 const els = {
     settingsBtn: document.getElementById('settings-btn'),
     settingsPanel: document.getElementById('settings-panel'),
-    themeSelect: document.getElementById('theme-select'),
+    themeSelect: document.getElementById('header-theme-select'), // Moved to header
     languageSelect: document.getElementById('language-select'),
     voiceSelect: document.getElementById('voice-select'),
     modesContainer: document.getElementById('modes-container'),
