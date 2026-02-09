@@ -9,12 +9,13 @@ const state = {
     },
     settings: {
         language: 'en-US',
-        theme: 'default',
-        modes: ['number', 'date', 'time', 'year'], // default active
+        theme: 'telegram', // Set new theme as default
+        modes: ['number', 'date', 'time', 'year'], 
         voice: null,
         autoSubmit: true
     },
-    isSpeaking: false
+    isSpeaking: false,
+    currentMode: 'number' // Initialize with a default
 };
 
 // DOM Elements
@@ -185,6 +186,7 @@ function nextQuestion() {
         return;
     }
     const mode = availableModes[Math.floor(Math.random() * availableModes.length)];
+    state.currentMode = mode; // Store current mode for hint rendering
     
     // 2. Generate
     const gen = generators[mode]();
@@ -193,8 +195,7 @@ function nextQuestion() {
     state.userInput = '';
     
     // 3. UI Reset
-    renderInput();
-    
+    // IMPORTANT: Update hint BEFORE resetting input to ensure it's visible
     // Update hint structure based on mode
     let hintHTML = "";
     switch(mode) {
@@ -219,15 +220,18 @@ function nextQuestion() {
             break;
         case 'date': 
             // Structure: Year Month Day
-            // Or screenshot style: Month Date (if that's the mode). 
-            // But my generator is YYYY-MM-DD. So:
             hintHTML = "<span>年</span> <span style='opacity:0.3'>/</span> <span>月</span> <span style='opacity:0.3'>/</span> <span>日</span>"; 
             break;
     }
+    // Debug log to console to verify execution
+    console.log("Setting hint to:", hintHTML);
     els.inputHint.innerHTML = hintHTML;
+    
+    // Ensure element is visible
+    els.inputHint.style.display = 'flex';
+    els.inputHint.style.opacity = '1';
 
-    els.messageArea.textContent = '';
-    els.messageArea.className = 'message hidden';
+    renderInput();
     
     // 4. Speak
     speak(gen.speak);
