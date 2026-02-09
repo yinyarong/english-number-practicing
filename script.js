@@ -207,11 +207,13 @@ function nextQuestion() {
     const gen = generators[mode]();
     state.currentAnswer = gen.answer;
     state.currentDisplay = gen.display;
+    state.currentSpeak = gen.speak; // Store!
     state.userInput = '';
     
     // 3. UI Reset
-    renderInput();
+    // IMPORTANT: Call updateHint BEFORE renderInput or just ensure it is called
     updateHint(); // Explicitly call updateHint
+    renderInput();
     
     els.messageArea.textContent = '';
     els.messageArea.className = 'message hidden';

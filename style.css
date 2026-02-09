@@ -102,6 +102,28 @@ header {
     color: var(--text-color);
 }
 
+/* Styles for Theme Toggle Button */
+#theme-toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#theme-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.hidden {
+    display: none;
+}
+
 h1 {
     font-size: 1.2rem;
     margin: 0;
@@ -217,8 +239,8 @@ select {
 .input-hint {
     font-size: 1rem;
     color: var(--text-color);
-    opacity: 0.8;
-    margin-bottom: 20px; /* Increased space */
+    /* Remove opacity:0.8 here as it might be overridden or inherited poorly */
+    margin-bottom: 20px; 
     font-weight: 500;
     letter-spacing: 1px;
     height: 1.5rem; /* Ensure enough height */
@@ -228,6 +250,8 @@ select {
     /* Force visibility */
     visibility: visible !important;
     min-width: 100px;
+    border: 1px dashed var(--input-border); /* Temporary debug border */
+    padding: 5px; /* Padding for border */
 }
 
 .cursor {
