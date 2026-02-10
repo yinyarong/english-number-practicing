@@ -26,8 +26,29 @@
                         <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"></path>
                     </svg>
                 </button>
+                <button id="history-btn" aria-label="历史记录">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+                    </svg>
+                </button>
             </div>
         </header>
+
+        <!-- History Modal -->
+        <div id="history-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>历史记录</h2>
+                    <button id="history-close-btn" class="modal-close">&times;</button>
+                </div>
+                <div class="modal-actions">
+                    <button id="history-clear-btn" class="btn-clear">清空记录</button>
+                </div>
+                <div id="history-list" class="history-list">
+                    <div class="history-empty">暂无记录</div>
+                </div>
+            </div>
+        </div>
 
         <div id="settings-panel" class="settings hidden">
             <!-- Theme select removed -->
@@ -117,9 +138,6 @@
                 <button class="key action" data-key="backspace">←</button>
                 <button class="key" data-key="0">0</button>
                 <button class="key action" data-key="enter">↵</button>
-            </div>
-            <div class="row" style="margin-top: 15px;">
-                 <button class="key action" data-key="replay" id="replay-btn" style="width: 100%; background-color: var(--accent-color); color: white;">重播 🔊</button>
             </div>
         </div>
     </div>
