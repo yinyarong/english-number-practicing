@@ -419,9 +419,10 @@ function renderInput() {
         return;
     }
 
-    // number/long-number use comma format, time uses colon format
+    // number/long-number use comma format, time uses colon format, date uses slash format
     const useCommaFormat = ['number', 'long-number'].includes(state.currentMode);
     const useColonFormat = state.currentMode === 'time';
+    const useSlashFormat = state.currentMode === 'date';
 
     if (useCommaFormat) {
         // Comma format for numbers: 1,234,567
@@ -448,11 +449,9 @@ function renderInput() {
         }
     } else if (useColonFormat) {
         // Colon format for time: 03:15
-        const h = state.currentAnswer.substring(0, 2);
-        const m = state.currentAnswer.substring(2, 4);
         const inputLen = state.userInput.length;
 
-        // Hour part
+        // Hour part (HH)
         for (let i = 0; i < 2; i++) {
             const span = document.createElement('span');
             if (i < inputLen) {
@@ -468,11 +467,64 @@ function renderInput() {
         const colonSpan = document.createElement('span');
         colonSpan.textContent = ':';
         colonSpan.style.color = 'var(--text-color)';
-        colonSpan.style.margin = '0 2px';
+        colonSpan.style.margin = '0 1px';
         els.userInput.appendChild(colonSpan);
 
-        // Minute part
+        // Minute part (MM)
         for (let i = 2; i < 4; i++) {
+            const span = document.createElement('span');
+            if (i < inputLen) {
+                span.textContent = state.userInput[i];
+            } else {
+                span.textContent = '_';
+                span.style.color = 'var(--placeholder-color)';
+            }
+            els.userInput.appendChild(span);
+        }
+    } else if (useSlashFormat) {
+        // Slash format for date: YYYY/MM/DD
+        const inputLen = state.userInput.length;
+
+        // Year part (YYYY)
+        for (let i = 0; i < 4; i++) {
+            const span = document.createElement('span');
+            if (i < inputLen) {
+                span.textContent = state.userInput[i];
+            } else {
+                span.textContent = '_';
+                span.style.color = 'var(--placeholder-color)';
+            }
+            els.userInput.appendChild(span);
+        }
+
+        // First slash
+        const slash1 = document.createElement('span');
+        slash1.textContent = '/';
+        slash1.style.color = 'var(--text-color)';
+        slash1.style.margin = '0 1px';
+        els.userInput.appendChild(slash1);
+
+        // Month part (MM)
+        for (let i = 4; i < 6; i++) {
+            const span = document.createElement('span');
+            if (i < inputLen) {
+                span.textContent = state.userInput[i];
+            } else {
+                span.textContent = '_';
+                span.style.color = 'var(--placeholder-color)';
+            }
+            els.userInput.appendChild(span);
+        }
+
+        // Second slash
+        const slash2 = document.createElement('span');
+        slash2.textContent = '/';
+        slash2.style.color = 'var(--text-color)';
+        slash2.style.margin = '0 1px';
+        els.userInput.appendChild(slash2);
+
+        // Day part (DD)
+        for (let i = 6; i < 8; i++) {
             const span = document.createElement('span');
             if (i < inputLen) {
                 span.textContent = state.userInput[i];
@@ -497,7 +549,7 @@ function renderInput() {
                 span.textContent = '_';
                 span.style.color = 'var(--placeholder-color)';
                 span.style.opacity = '1';
-                span.style.margin = '0 2px';
+                span.style.margin = '0 1px';
                 els.userInput.appendChild(span);
             }
         }
